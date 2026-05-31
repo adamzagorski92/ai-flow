@@ -1,9 +1,21 @@
-## Git Workflow Rules
+## AI Workflow Rules
 
-- Always work on branch: feature/<your-name>/<short-task-name>
-- Commit after every completed, working feature (not half-done code)
-- Commit message format: feat: <co zrobiłeś w 1 zdaniu>
-- Never push to main or develop directly
-- After finishing task, open Pull Request to develop branch
-- If there are conflicts, resolve them before opening PR
-- Run tests before every commit (npm test)
+- Work only in full Agent AI mode. Do not write code manually in the repo.
+- Repository access is via your own GitHub account and your own SSH key.
+- Main protected branches are `master` and `develop`.
+- Never push directly to `master` or `develop`.
+- Never force-push to `master` or `develop`.
+- Always start from the latest `develop` and use rebase.
+- Always work on branch: `feature/<your-name>/<short-task-name>`
+- One branch = one task. One Pull Request = one topic.
+- Before every push and before every PR run: `git fetch origin && git rebase origin/develop`
+- Never merge `develop` into a feature branch. Always rebase feature onto `develop`.
+- If there are conflicts, resolve them on the feature branch before merging.
+- `git push --force-with-lease` is allowed only on your own `feature/...` branch after rebase.
+- Commit only completed, working changes.
+- Commit message format: `feat: <co zrobiłeś w 1 zdaniu>`
+- Run tests before every commit and before every PR: `npm test`
+- After finishing task, open Pull Request to `develop`.
+- PRs to `develop` must be merged only with `Rebase and merge`.
+- After each valid update of `develop`, open PR from `develop` to `master`.
+- PRs to `master` must also be merged only with `Rebase and merge`.
