@@ -14,7 +14,7 @@ fi
 
 audio_file="$1"
 language="${2:-auto}"
-model_name="${WHISPER_MODEL:-large-v3-turbo}"
+model_name="${WHISPER_MODEL:-medium}"
 model_dir="${WHISPER_MODEL_DIR:-/opt/whisper/models}"
 model_path="${model_dir}/ggml-${model_name}.bin"
 

@@ -2,9 +2,9 @@ FROM node:22-bookworm-slim
 
 ARG USER_UID=1000
 ARG USER_GID=1000
-ARG OPENCODE_NPM_SPEC=opencode-ai@latest
-ARG BEADS_NPM_SPEC=@beads/bd@latest
-ARG WHISPER_CPP_REF=master
+ARG OPENCODE_NPM_SPEC=opencode-ai@1.15.13
+ARG BEADS_NPM_SPEC=@beads/bd@1.0.4
+ARG WHISPER_CPP_REF=v1.8.5
 
 ENV DEBIAN_FRONTEND=noninteractive \
     NPM_CONFIG_UPDATE_NOTIFIER=false \

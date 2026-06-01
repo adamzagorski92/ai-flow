@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-model_name="${WHISPER_MODEL:-large-v3-turbo}"
+model_name="${WHISPER_MODEL:-medium}"
 model_dir="${WHISPER_MODEL_DIR:-/opt/whisper/models}"
 model_file="ggml-${model_name}.bin"
 default_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/${model_file}"

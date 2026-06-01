@@ -10,6 +10,7 @@ if [[ -f "$dir/.env" ]]; then
       /^[[:space:]]*HOST_OS[[:space:]]*=/ {
         value = substr($0, index($0, "=") + 1)
         gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+        gsub(/\r/, "", value)
         if ((value ~ /^".*"$/) || (value ~ /^\047.*\047$/)) {
           value = substr(value, 2, length(value) - 2)
         }

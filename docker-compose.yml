@@ -18,9 +18,12 @@ services:
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
       HOME: /home/dev
+      OPENCODE_PROVIDER: ${OPENCODE_PROVIDER:-opencode}
+      OPENCODE_ZEN_MODEL_ID: ${OPENCODE_ZEN_MODEL_ID:-kimi-k2.6}
+      OPENCODE_ZEN_SMALL_MODEL_ID: ${OPENCODE_ZEN_SMALL_MODEL_ID:-gpt-5.4-nano}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-      OPENCODE_MODEL: ${OPENCODE_MODEL:-openrouter/moonshotai/kimi-k2}
-      OPENCODE_SMALL_MODEL: ${OPENCODE_SMALL_MODEL:-openrouter/openai/gpt-4.1-mini}
+      OPENROUTER_MODEL_ID: ${OPENROUTER_MODEL_ID:-moonshotai/kimi-k2}
+      OPENROUTER_SMALL_MODEL_ID: ${OPENROUTER_SMALL_MODEL_ID:-openai/gpt-4.1-mini}
       OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-https://github.com/adamzagorski92/ai-flow}
       OPENROUTER_APP_NAME: ${OPENROUTER_APP_NAME:-ai-flow-workbench}
       APP_CODE_NAME: ${APP_CODE_NAME:-moja-aplikacja}
@@ -30,7 +33,7 @@ services:
       GIT_COMMITTER_NAME: ${GIT_COMMITTER_NAME:-}
       GIT_COMMITTER_EMAIL: ${GIT_COMMITTER_EMAIL:-}
       GH_TOKEN: ${GH_TOKEN:-}
-      WHISPER_MODEL: ${WHISPER_MODEL:-large-v3-turbo}
+      WHISPER_MODEL: ${WHISPER_MODEL:-medium}
       WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
     volumes:
       - .:/workspace
@@ -60,7 +63,7 @@ services:
       DISPLAY: ${DISPLAY:-:0}
       XAUTHORITY: /tmp/host.Xauthority
       PULSE_SERVER: unix:/tmp/pulse/native
-      WHISPER_MODEL: ${WHISPER_MODEL:-large-v3-turbo}
+      WHISPER_MODEL: ${WHISPER_MODEL:-medium}
       WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
       VOICE_LANGUAGE: ${VOICE_LANGUAGE:-pl}
       VOICE_HOTKEY_KEYCODE: ${VOICE_HOTKEY_KEYCODE:-64}
@@ -73,7 +76,7 @@ services:
       - .:/workspace
       - ./.workbench/whisper-models:/opt/whisper/models
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/tmp/host.Xauthority:ro
-      - ${XDG_RUNTIME_DIR:-/run/user/1000}/pulse/native:/tmp/pulse/native
+      - ${XAUTHORITY:-/run/user/${LOCAL_UID:-1000}/gdm/Xauthority}:/tmp/host.Xauthority:ro
+      - ${XDG_RUNTIME_DIR:-/run/user/${LOCAL_UID:-1000}}/pulse/native:/tmp/pulse/native
     entrypoint: ["/usr/local/bin/workbench-entrypoint.sh"]
     command: ["/usr/local/bin/voice-linux-daemon.sh"]

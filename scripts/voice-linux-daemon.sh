@@ -194,6 +194,27 @@ while read -r event_type event_state event_key _; do
     done
 
     if [[ "$is_repeat" == "true" ]]; then
+      # A press event was consumed during debounce. Stop the current recording and
+      # immediately start a new one so the consumed press is not silently lost.
+      kill "$ffmpeg_pid" 2>/dev/null || true
+      wait "$ffmpeg_pid" 2>/dev/null || true
+      ffmpeg_pid=""
+
+      if transcribe_and_emit "$audio_file" "$target_window"; then
+        log "transcript delivered"
+      else
+        log "transcription failed"
+      fi
+
+      rm -f "$audio_file"
+      audio_file="$(mktemp "$record_dir/voice-input.XXXXXX.wav")"
+      target_window=""
+      if [[ "$insert_mode" == "xdotool" ]]; then
+        target_window="$(xdotool getactivewindow 2>/dev/null || true)"
+      fi
+      ffmpeg -nostdin -loglevel error -y -f pulse -i "$pulse_input" -ar 16000 -ac 1 "$audio_file" &
+      ffmpeg_pid=$!
+      log "recording started"
       continue
     fi
 
