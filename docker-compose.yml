@@ -1,0 +1,82 @@
+services:
+  workbench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_UID: ${LOCAL_UID:-1000}
+        USER_GID: ${LOCAL_GID:-1000}
+        OPENCODE_NPM_SPEC: ${OPENCODE_NPM_SPEC:-opencode-ai@latest}
+        BEADS_NPM_SPEC: ${BEADS_NPM_SPEC:-@beads/bd@latest}
+        WHISPER_CPP_REF: ${WHISPER_CPP_REF:-master}
+    image: ${WORKBENCH_IMAGE:-ai-flow/workbench:latest}
+    container_name: ${WORKBENCH_CONTAINER_NAME:-ai-flow-workbench}
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      HOME: /home/dev
+      OPENCODE_PROVIDER: ${OPENCODE_PROVIDER:-opencode}
+      OPENCODE_ZEN_MODEL_ID: ${OPENCODE_ZEN_MODEL_ID:-kimi-k2.6}
+      OPENCODE_ZEN_SMALL_MODEL_ID: ${OPENCODE_ZEN_SMALL_MODEL_ID:-gpt-5.4-nano}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL_ID: ${OPENROUTER_MODEL_ID:-moonshotai/kimi-k2}
+      OPENROUTER_SMALL_MODEL_ID: ${OPENROUTER_SMALL_MODEL_ID:-openai/gpt-4.1-mini}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-https://github.com/adamzagorski92/ai-flow}
+      OPENROUTER_APP_NAME: ${OPENROUTER_APP_NAME:-ai-flow-workbench}
+      APP_CODE_NAME: ${APP_CODE_NAME:-moja-aplikacja}
+      APP_CODE_DIR: /workspace/apps/${APP_CODE_NAME:-moja-aplikacja}
+      GIT_AUTHOR_NAME: ${GIT_AUTHOR_NAME:-}
+      GIT_AUTHOR_EMAIL: ${GIT_AUTHOR_EMAIL:-}
+      GIT_COMMITTER_NAME: ${GIT_COMMITTER_NAME:-}
+      GIT_COMMITTER_EMAIL: ${GIT_COMMITTER_EMAIL:-}
+      GH_TOKEN: ${GH_TOKEN:-}
+      WHISPER_MODEL: ${WHISPER_MODEL:-medium}
+      WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
+    volumes:
+      - .:/workspace
+      - ./apps:/workspace/apps
+      - ${HOME}/.ssh:/home/dev/.ssh:ro
+      - ./.workbench/gh:/home/dev/.config/gh
+      - ./.workbench/opencode:/home/dev/.config/opencode
+      - ./.workbench/opencode-state:/home/dev/.local/share/opencode
+      - ./.workbench/whisper-models:/opt/whisper/models
+    entrypoint: ["/usr/local/bin/workbench-entrypoint.sh"]
+    command: ["sleep", "infinity"]
+
+  voice-linux:
+    profiles: ["voice-linux"]
+    image: ${WORKBENCH_IMAGE:-ai-flow/workbench:latest}
+    container_name: ${VOICE_LINUX_CONTAINER_NAME:-ai-flow-voice-linux}
+    depends_on:
+      workbench:
+        condition: service_started
+    working_dir: /workspace
+    restart: unless-stopped
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      HOME: /home/dev
+      HOST_OS: ${HOST_OS:-auto}
+      DISPLAY: ${DISPLAY:-:0}
+      XAUTHORITY: /tmp/host.Xauthority
+      PULSE_SERVER: unix:/tmp/pulse/native
+      WHISPER_MODEL: ${WHISPER_MODEL:-medium}
+      WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
+      VOICE_LANGUAGE: ${VOICE_LANGUAGE:-pl}
+      VOICE_HOTKEY_KEYCODE: ${VOICE_HOTKEY_KEYCODE:-64}
+      VOICE_INSERT_MODE: ${VOICE_INSERT_MODE:-xdotool}
+      VOICE_TYPE_DELAY_MS: ${VOICE_TYPE_DELAY_MS:-1}
+      VOICE_PRESS_ENTER_AFTER_TYPE: ${VOICE_PRESS_ENTER_AFTER_TYPE:-0}
+      VOICE_PULSE_INPUT: ${VOICE_PULSE_INPUT:-default}
+      VOICE_INPUT_FILE: ${VOICE_INPUT_FILE:-}
+    volumes:
+      - .:/workspace
+      - ./.workbench/whisper-models:/opt/whisper/models
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY:-/run/user/${LOCAL_UID:-1000}/gdm/Xauthority}:/tmp/host.Xauthority:ro
+      - ${XDG_RUNTIME_DIR:-/run/user/${LOCAL_UID:-1000}}/pulse/native:/tmp/pulse/native
+    entrypoint: ["/usr/local/bin/workbench-entrypoint.sh"]
+    command: ["/usr/local/bin/voice-linux-daemon.sh"]

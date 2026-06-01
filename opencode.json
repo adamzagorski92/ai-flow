@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "build",
+  "enabled_providers": ["{env:OPENCODE_ENABLED_PROVIDER}"],
+  "model": "{env:OPENCODE_RESOLVED_MODEL}",
+  "small_model": "{env:OPENCODE_RESOLVED_SMALL_MODEL}",
+  "share": "manual",
+  "shell": "/bin/bash",
+  "instructions": [
+    "AGENTS.md",
+    "Flow-solution.md",
+    "Agent-flow.md",
+    "READY.md",
+    "TODO.md"
+  ],
+  "permission": {
+    "bash": "ask",
+    "edit": "ask",
+    "write": "ask"
+  },
+  "provider": {
+    "opencode": {
+      "options": {
+        "timeout": 600000,
+        "chunkTimeout": 30000
+      }
+    },
+    "openrouter": {
+      "options": {
+        "apiKey": "{env:OPENROUTER_API_KEY}",
+        "headers": {
+          "HTTP-Referer": "{env:OPENROUTER_SITE_URL}",
+          "X-Title": "{env:OPENROUTER_APP_NAME}"
+        },
+        "timeout": 600000,
+        "chunkTimeout": 30000
+      }
+    }
+  }
+}

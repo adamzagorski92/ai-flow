@@ -1,0 +1,52 @@
+## AI Workflow Rules
+
+- Work only in full Agent AI mode.
+- Humans define tasks, review outcomes, approve PRs when needed, and configure GitHub; agents create code, update branches, resolve conflicts, and prepare PRs.
+- Do not write or fix code manually in the repo. If something must change, send it back to an agent.
+- The primary development runtime is the `workbench` Docker service. Use the containerized toolchain when available so macOS, Ubuntu, and Windows/WSL behave the same way.
+- `READY.md` is the canonical registry of capabilities already merged into `develop`.
+- `TODO.md` is the active iteration registry for capabilities that still need more than one step or more than one PR.
+- Before starting any task, the Feature Agent must inspect both `READY.md` and `TODO.md`.
+- If the capability already exists or already has an open iteration, extend or fix the existing module; do not create a duplicate feature under a new name.
+- One capability = one canonical row in `READY.md` and at most one open row in `TODO.md`.
+- Work in the loop: `Research -> Plan -> Execute`.
+- Repository access is via your own GitHub account and your own SSH key.
+- Main protected branches are `master` and `develop`.
+- `master` and `develop` are protected by GitHub rulesets. There is no bypass list.
+- Never push directly to `master` or `develop`.
+- Never force-push to `master` or `develop`.
+- Always start from the latest `develop` and use rebase.
+- Always work on branch: `feature/<your-name>/<short-task-name>`.
+- One branch = one task. One Pull Request = one topic.
+- One capability may span multiple iterations, but each iteration still uses one branch and one PR.
+- Before every push and before every PR run: `git fetch origin && git rebase origin/develop`.
+- Never use GitHub `Update branch`. Always rebase the feature branch onto `origin/develop`.
+- Never merge `develop` into a feature branch. Always rebase feature onto `develop`.
+- If `develop` changes while your PR is open, rebase again before merge.
+- If there are conflicts, resolve them on the feature branch before merging.
+- `git push --force-with-lease` is allowed only on your own `feature/...` branch after rebase.
+- Commit only completed, working changes.
+- Commit message format: `feat: <co zrobiłeś w 1 zdaniu>`.
+- Tests are sacred. If checks fail, fix code; do not change tests just to make CI green.
+- For capability enhancements, all previously passing tests stay unchanged; add new tests only for new behavior.
+- For bugfixes, add a regression test first. Change an existing test only if the previous expected behavior was wrong, and record the contract correction in `READY.md` and in the PR description.
+- Run tests before every commit and before every PR: `npm test`.
+- If GitHub status checks are configured in rulesets, the PR branch must be green and up to date before merge.
+- Feature Agent: creates code on `feature/...`, runs tests, rebases, opens PR to `develop`, and updates its own row in `TODO.md` when the capability needs more iterations.
+- Develop Integration Agent: takes every PR to `develop`, rebases it onto `origin/develop`, resolves conflicts on the feature branch, reruns tests, improves code only if needed for compatibility or quality, updates `READY.md`, normalizes or closes `TODO.md`, and prepares approval and merge.
+- Release Agent: after every valid update of `develop`, opens or refreshes PR from `develop` to `master` and runs the same verification flow for release.
+- After finishing task, open Pull Request to `develop`.
+- Related but separate capability ideas go to the suggestion table in `TODO.md`; do not start duplicate work automatically.
+- To reduce conflicts in the registries, `READY.md` is updated only by the Develop Integration Agent, while `TODO.md` is edited row-by-row by the owning Feature Agent and normalized by the Develop Integration Agent.
+- New capabilities are appended at the end of the `READY.md` table; do not sort the whole file during routine work.
+- New active rows and new suggestion rows in `TODO.md` are appended at the end; do not sort the whole file during routine work.
+- A PR approval must come from a different GitHub identity than the PR author.
+- Every PR requires at least 1 approval before merge.
+- If new commits are pushed to a PR, previous approvals are treated as stale. Re-run the agent flow, re-test, and get approval again.
+- Resolve all PR conversations before merge.
+- PRs to `develop` must be merged only with `Rebase and merge`.
+- Do not use `Merge commit` or `Squash merge`.
+- After each valid update of `develop`, open PR from `develop` to `master`.
+- If a `develop -> master` PR fails, create a new fix branch from `develop`, repair code there, merge it back to `develop`, and then refresh the PR to `master`.
+- PRs to `master` follow the same rules: approval required, resolved conversations, green checks if configured, and `Rebase and merge` only.
+- At high throughput, prefer adding new modules, adapters, feature flags, and isolated contracts instead of changing shared files.
