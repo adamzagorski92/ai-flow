@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "default_agent": "build",
+  "default_agent": "feature-agent",
   "enabled_providers": ["{env:OPENCODE_ENABLED_PROVIDER}"],
   "model": "{env:OPENCODE_RESOLVED_MODEL}",
   "small_model": "{env:OPENCODE_RESOLVED_SMALL_MODEL}",
@@ -18,6 +18,10 @@
     "edit": true,
     "write": true
   },
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+
   "provider": {
     "opencode": {
       "options": {
