@@ -5,7 +5,7 @@ Główny workflow to: lokalne repo po SSH, jeden kontener `workbench`, a w nim `
 
 Stan narzędzi kontenerowych jest trzymany lokalnie w ukrytym katalogu `.workbench/` w repo. Dzięki temu każdy klon ma własne cache, logowanie `gh`, ustawienia OpenCode i modele Whisper bez problemów z uprawnieniami Dockera.
 
-Właściwy kod aplikacji nie trafia do `.workbench`. Jeśli kod ma lądować w Git, lepszym miejscem jest `apps/<APP_CODE_NAME>`: to katalog wersjonowany, oddzielony od cache, tokenów i stanu CLI.
+Właściwy kod aplikacji nie trafia do `.workbench`. Jeśli kod ma lądować w Git, lepszym miejscem jest `apps/`: to katalog wersjonowany (Turborepo-style), oddzielony od cache, tokenów i stanu CLI.
 
 ## Co jest gotowe
 
@@ -14,7 +14,7 @@ Właściwy kod aplikacji nie trafia do `.workbench`. Jeśli kod ma lądować w G
 - `gh` jest dostępne do pracy z PR-ami i repo GitHub
 - `bd` jest dostępne do planowania iteracji agentowych
 - `whisper.cpp` i model są przygotowane do transkrypcji audio w kontenerze
-- katalog `apps/<APP_CODE_NAME>` jest tworzony automatycznie jako miejsce na kod aplikacji
+- katalog `apps/` jest gotowy jako miejsce na kod aplikacji (Turborepo-style)
 
 ## Wymagania
 
@@ -29,8 +29,7 @@ Właściwy kod aplikacji nie trafia do `.workbench`. Jeśli kod ma lądować w G
 1. Skopiuj `.env.example` do `.env`.
 2. Uzupełnij minimum:
    - `OPENCODE_PROVIDER`
-   - `APP_CODE_NAME`
-   - `GIT_AUTHOR_NAME`
+    - `GIT_AUTHOR_NAME`
    - `GIT_AUTHOR_EMAIL`
 3. Jeśli wybierasz `OPENCODE_PROVIDER=openrouter`, ustaw też `OPENROUTER_API_KEY`.
 4. Jeśli wybierasz `OPENCODE_PROVIDER=opencode`, po uruchomieniu `opencode` zrób jednorazowe `/connect` i wybierz `OpenCode Zen`.
@@ -51,7 +50,7 @@ bash scripts/enter-workbench.sh
 9. Przejdź do katalogu aplikacji:
 
 ```bash
-cd "$APP_CODE_DIR"
+cd /workspace/apps
 ```
 
 10. Jeśli nie używasz `GH_TOKEN`, zaloguj `gh` raz w środku kontenera:
@@ -112,9 +111,9 @@ Dla OpenRoutera workflow jest taki:
 
 ## Gdzie powstaje kod aplikacji
 
-- `APP_CODE_NAME` w `.env` wskazuje nazwę katalogu roboczego aplikacji
-- host przechowuje kod w `./apps/$APP_CODE_NAME`
-- kontener widzi ten sam katalog jako `/workspace/apps/$APP_CODE_NAME`
+- host przechowuje kod w `./apps/`
+- kontener widzi ten sam katalog jako `/workspace/apps/`
+- struktura Turborepo: `./apps/web`, `./apps/api`, itd.
 - katalog `.workbench/` zostaje tylko na stan OpenCode, `gh`, modele Whisper i cache runtime
 
 ## Whisper.cpp
