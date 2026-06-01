@@ -1,0 +1,16 @@
+.env
+.env.local
+.DS_Store
+.workbench/*
+!.workbench/gh/
+!.workbench/opencode/
+!.workbench/opencode-state/
+!.workbench/whisper-models/
+.workbench/gh/*
+!.workbench/gh/.gitkeep
+.workbench/opencode/*
+!.workbench/opencode/.gitkeep
+.workbench/opencode-state/*
+!.workbench/opencode-state/.gitkeep
+.workbench/whisper-models/*
+!.workbench/whisper-models/.gitkeep

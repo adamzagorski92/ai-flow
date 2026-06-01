@@ -1,0 +1,42 @@
+services:
+  workbench:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_UID: ${LOCAL_UID:-1000}
+        USER_GID: ${LOCAL_GID:-1000}
+        OPENCODE_NPM_SPEC: ${OPENCODE_NPM_SPEC:-opencode-ai@latest}
+        BEADS_NPM_SPEC: ${BEADS_NPM_SPEC:-@beads/bd@latest}
+        WHISPER_CPP_REF: ${WHISPER_CPP_REF:-master}
+    image: ${WORKBENCH_IMAGE:-ai-flow/workbench:latest}
+    container_name: ${WORKBENCH_CONTAINER_NAME:-ai-flow-workbench}
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    environment:
+      HOME: /home/dev
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENCODE_MODEL: ${OPENCODE_MODEL:-openrouter/moonshotai/kimi-k2}
+      OPENCODE_SMALL_MODEL: ${OPENCODE_SMALL_MODEL:-openrouter/openai/gpt-4.1-mini}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-https://github.com/adamzagorski92/ai-flow}
+      OPENROUTER_APP_NAME: ${OPENROUTER_APP_NAME:-ai-flow-workbench}
+      APP_CODE_NAME: ${APP_CODE_NAME:-moja-aplikacja}
+      APP_CODE_DIR: /workspace/apps/${APP_CODE_NAME:-moja-aplikacja}
+      GIT_AUTHOR_NAME: ${GIT_AUTHOR_NAME:-}
+      GIT_AUTHOR_EMAIL: ${GIT_AUTHOR_EMAIL:-}
+      GIT_COMMITTER_NAME: ${GIT_COMMITTER_NAME:-}
+      GIT_COMMITTER_EMAIL: ${GIT_COMMITTER_EMAIL:-}
+      GH_TOKEN: ${GH_TOKEN:-}
+      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
+    volumes:
+      - .:/workspace
+      - ./apps:/workspace/apps
+      - ${HOME}/.ssh:/home/dev/.ssh:ro
+      - ./.workbench/gh:/home/dev/.config/gh
+      - ./.workbench/opencode:/home/dev/.config/opencode
+      - ./.workbench/opencode-state:/home/dev/.local/share/opencode
+      - ./.workbench/whisper-models:/opt/whisper/models
+    entrypoint: ["/usr/local/bin/workbench-entrypoint.sh"]
+    command: ["sleep", "infinity"]
