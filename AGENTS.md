@@ -37,6 +37,7 @@
 - Develop Integration Agent: takes every PR to `develop`, rebases it onto `origin/develop`, resolves conflicts on the feature branch, reruns tests, improves code only if needed for compatibility or quality, updates `READY.md`, normalizes or closes `TODO.md`, and prepares approval and merge.
 - Release Agent: after every valid update of `develop`, opens or refreshes PR from `develop` to `master` and runs the same verification flow for release.
 - After finishing task, open Pull Request to `develop`.
+- After pushing changes to remote, ask the user if the task is complete. If yes, switch to `develop` and clean up the feature branch.
 - Related but separate capability ideas go to the suggestion table in `TODO.md`; do not start duplicate work automatically.
 - To reduce conflicts in the registries, `READY.md` is updated only by the Develop Integration Agent, while `TODO.md` is edited row-by-row by the owning Feature Agent and normalized by the Develop Integration Agent.
 - New capabilities are appended at the end of the `READY.md` table; do not sort the whole file during routine work.
