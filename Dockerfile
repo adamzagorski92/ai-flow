@@ -23,10 +23,14 @@ RUN apt-get update \
         jq \
         less \
         libgomp1 \
+        libpulse0 \
         openssh-client \
         pkg-config \
         procps \
         ripgrep \
+        xauth \
+        xdotool \
+        xinput \
     && rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g "$OPENCODE_NPM_SPEC" "$BEADS_NPM_SPEC" \
@@ -56,9 +60,10 @@ RUN git config --system pull.rebase true \
 COPY scripts/workbench-entrypoint.sh /usr/local/bin/workbench-entrypoint.sh
 COPY scripts/install-whisper-model.sh /usr/local/bin/install-whisper-model.sh
 COPY scripts/opencode-wrapper.sh /usr/local/bin/opencode
+COPY scripts/voice-linux-daemon.sh /usr/local/bin/voice-linux-daemon.sh
 COPY scripts/whisper-transcribe.sh /usr/local/bin/whisper-transcribe
 
-RUN chmod +x /usr/local/bin/workbench-entrypoint.sh /usr/local/bin/install-whisper-model.sh /usr/local/bin/opencode /usr/local/bin/whisper-transcribe
+RUN chmod +x /usr/local/bin/workbench-entrypoint.sh /usr/local/bin/install-whisper-model.sh /usr/local/bin/opencode /usr/local/bin/voice-linux-daemon.sh /usr/local/bin/whisper-transcribe
 
 USER dev
 WORKDIR /workspace

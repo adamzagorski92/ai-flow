@@ -120,6 +120,8 @@ Dla OpenRoutera workflow jest taki:
 ## Whisper.cpp
 
 Przy pierwszym starcie kontenera model `whisper.cpp` jest pobierany do `.workbench/whisper-models`.
+Domyślnie repo używa `WHISPER_MODEL=medium`, bo `base` daje wyraźnie słabsze wyniki dla polskiego voice input, a `large-v3` jest dużo cięższy w pobraniu i uruchamianiu.
+Jeśli `medium` nadal będzie za słaby dla Twojego głosu albo gorszego mikrofonu, wtedy dopiero warto podnieść model ręcznie do `large-v3`.
 Do transkrypcji plików audio użyj:
 
 ```bash
@@ -128,17 +130,79 @@ whisper-transcribe /sciezka/do/pliku.wav
 
 ## Ważne ograniczenie voice
 
-`whisper.cpp` jest w kontenerze, ale dokładne `push-to-talk` pod sam klawisz `Alt` nie zostało spięte jako uniwersalny mechanizm dla macOS, Ubuntu i Windows/WSL.
-To nie jest ograniczenie repo, tylko miksu: terminal, host OS, mikrofon i Docker.
+`whisper.cpp` jest poprawnie spięty z kontenerem, ale pełny tryb `Alt -> mów -> tekst trafia do aktywnego promptu` da się sensownie uruchamiać tylko tam, gdzie host udostępnia globalny hotkey, audio z mikrofonu i możliwość wpisywania tekstu do aktywnego okna.
 
-W tej wersji wdrożenia:
+W tym repo:
 
-- transkrypcja przez `whisper.cpp` jest gotowa
-- główny workflow agentowy jest gotowy
-- pełny globalny hotkey `Alt -> mów -> wstaw do opencode` wymaga osobnej hostowej nakładki dla każdego OS
+- Linux z X11/Xwayland dostaje zintegrowany daemon `voice-linux`, który startuje razem z `docker compose up`
+- macOS i Windows zostają na razie przy hostowych skryptach fallback
 
-Jeśli będziesz chciał, kolejny etap może dodać osobne host-helpery dla:
+## Voice input
 
-- macOS
-- Ubuntu/Linux
-- Windows/WSL
+Głosowe wprowadzanie komend działa w dwóch trybach:
+
+- Linux/X11: automatyczny daemon Compose, który nasłuchuje `Alt`, nagrywa, transkrybuje i wpisuje tekst do aktywnego okna
+- macOS / Windows: ręczne skrypty hostowe uruchamiane przez `./voice.sh`
+
+### Linux auto-start przez Docker Compose
+
+Na Linuxie ustaw w `.env`:
+
+```bash
+HOST_OS=linux
+COMPOSE_PROFILES=voice-linux
+```
+
+Po tym zwykłe:
+
+```bash
+docker compose up -d --build
+```
+
+uruchomi także usługę `voice-linux`.
+
+Domyślne zachowanie:
+
+- przytrzymujesz `Alt`
+- daemon nagrywa mikrofon z hosta przez PulseAudio / PipeWire Pulse
+- po puszczeniu `Alt` uruchamia `whisper-transcribe`
+- transkrypcja jest wpisywana do aktywnego okna przez `xdotool`
+
+Konfigurowalne zmienne w `.env`:
+
+- `VOICE_LANGUAGE` — język transkrypcji, np. `pl`
+- `VOICE_HOTKEY_KEYCODE` — domyślnie `64` dla lewego `Alt` w X11
+- `VOICE_INSERT_MODE` — `xdotool` albo `stdout`
+- `VOICE_TYPE_DELAY_MS` — opóźnienie między znakami przy wpisywaniu
+- `VOICE_PRESS_ENTER_AFTER_TYPE` — `1`, jeśli po wpisaniu ma być wysyłany Enter
+- `VOICE_PULSE_INPUT` — źródło PulseAudio, domyślnie `default`
+- `WHISPER_MODEL` — domyślnie `medium`; ustaw `large-v3` tylko jeśli `medium` nadal nie daje wystarczającej jakości dla polskiego
+
+Ten tryb wymaga Linuxa z aktywnym `DISPLAY`, socketem Pulse i działającym X11/Xwayland.
+
+### Użycie
+
+```bash
+./voice.sh           # domyślnie język pl
+./voice.sh en        # transkrypcja po angielsku
+```
+
+To jest fallback hostowy. Przytrzymaj **Alt (Option)**, mów do mikrofonu, a po puszczeniu klawisza transkrypcja pojawi się na stdout.
+
+### Wymagania na hoście
+
+| System                    | Wymagane narzędzia                |
+| ------------------------- | --------------------------------- |
+| **macOS**                 | `ffmpeg` (`brew install ffmpeg`)  |
+| **Linux manual fallback** | `ffmpeg` lub `arecord` + `xinput` |
+| **Windows**               | `ffmpeg` + PowerShell             |
+
+### Skrypty
+
+| Plik                            | System             | Mechanizm                                                               |
+| ------------------------------- | ------------------ | ----------------------------------------------------------------------- |
+| `host/record-macos.sh`          | macOS              | Polling Option key przez `osascript`                                    |
+| `host/record-linux.sh`          | Linux / WSL        | Manual fallback przez eventy Alt (keycode 64) z `xinput test`           |
+| `host/record-windows.ps1`       | Windows            | `GetAsyncKeyState` przez P/Invoke w PowerShell                          |
+| `voice.sh`                      | Główny entry point | Czyta `HOST_OS` z `.env` i deleguje                                     |
+| `scripts/voice-linux-daemon.sh` | Linux / X11        | Daemon Compose: nagrywa, transkrybuje i wpisuje tekst do aktywnego okna |

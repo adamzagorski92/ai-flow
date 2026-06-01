@@ -15,6 +15,8 @@ services:
     stdin_open: true
     tty: true
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       HOME: /home/dev
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       OPENCODE_MODEL: ${OPENCODE_MODEL:-openrouter/moonshotai/kimi-k2}
@@ -28,7 +30,7 @@ services:
       GIT_COMMITTER_NAME: ${GIT_COMMITTER_NAME:-}
       GIT_COMMITTER_EMAIL: ${GIT_COMMITTER_EMAIL:-}
       GH_TOKEN: ${GH_TOKEN:-}
-      WHISPER_MODEL: ${WHISPER_MODEL:-base}
+      WHISPER_MODEL: ${WHISPER_MODEL:-large-v3-turbo}
       WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
     volumes:
       - .:/workspace
@@ -40,3 +42,38 @@ services:
       - ./.workbench/whisper-models:/opt/whisper/models
     entrypoint: ["/usr/local/bin/workbench-entrypoint.sh"]
     command: ["sleep", "infinity"]
+
+  voice-linux:
+    profiles: ["voice-linux"]
+    image: ${WORKBENCH_IMAGE:-ai-flow/workbench:latest}
+    container_name: ${VOICE_LINUX_CONTAINER_NAME:-ai-flow-voice-linux}
+    depends_on:
+      workbench:
+        condition: service_started
+    working_dir: /workspace
+    restart: unless-stopped
+    environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      HOME: /home/dev
+      HOST_OS: ${HOST_OS:-auto}
+      DISPLAY: ${DISPLAY:-:0}
+      XAUTHORITY: /tmp/host.Xauthority
+      PULSE_SERVER: unix:/tmp/pulse/native
+      WHISPER_MODEL: ${WHISPER_MODEL:-large-v3-turbo}
+      WHISPER_MODEL_URL: ${WHISPER_MODEL_URL:-}
+      VOICE_LANGUAGE: ${VOICE_LANGUAGE:-pl}
+      VOICE_HOTKEY_KEYCODE: ${VOICE_HOTKEY_KEYCODE:-64}
+      VOICE_INSERT_MODE: ${VOICE_INSERT_MODE:-xdotool}
+      VOICE_TYPE_DELAY_MS: ${VOICE_TYPE_DELAY_MS:-1}
+      VOICE_PRESS_ENTER_AFTER_TYPE: ${VOICE_PRESS_ENTER_AFTER_TYPE:-0}
+      VOICE_PULSE_INPUT: ${VOICE_PULSE_INPUT:-default}
+      VOICE_INPUT_FILE: ${VOICE_INPUT_FILE:-}
+    volumes:
+      - .:/workspace
+      - ./.workbench/whisper-models:/opt/whisper/models
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${XAUTHORITY:-/run/user/1000/gdm/Xauthority}:/tmp/host.Xauthority:ro
+      - ${XDG_RUNTIME_DIR:-/run/user/1000}/pulse/native:/tmp/pulse/native
+    entrypoint: ["/usr/local/bin/workbench-entrypoint.sh"]
+    command: ["/usr/local/bin/voice-linux-daemon.sh"]

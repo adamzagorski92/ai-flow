@@ -1,6 +1,7 @@
 .env
 .env.local
 .DS_Store
+.tmp/
 .workbench/*
 !.workbench/gh/
 !.workbench/opencode/
