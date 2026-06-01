@@ -3,10 +3,9 @@ set -euo pipefail
 
 mkdir -p "$HOME/.config" "$HOME/.local/share"
 
-app_code_name="${APP_CODE_NAME:-moja-aplikacja}"
-app_code_dir="${APP_CODE_DIR:-/workspace/apps/$app_code_name}"
+app_code_dir="${APP_CODE_DIR:-/workspace/apps}"
 
-mkdir -p /workspace/apps "$app_code_dir"
+mkdir -p "$app_code_dir"
 
 if [[ -n "${GIT_AUTHOR_NAME:-}" ]]; then
   git config --global user.name "$GIT_AUTHOR_NAME"

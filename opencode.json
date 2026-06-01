@@ -14,9 +14,9 @@
     "TODO.md"
   ],
   "permission": {
-    "bash": "ask",
-    "edit": "ask",
-    "write": "ask"
+    "bash": true,
+    "edit": true,
+    "write": true
   },
   "provider": {
     "opencode": {

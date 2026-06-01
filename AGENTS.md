@@ -15,6 +15,7 @@
 - `master` and `develop` are protected by GitHub rulesets. There is no bypass list.
 - Never push directly to `master` or `develop`.
 - Never force-push to `master` or `develop`.
+- Never make changes directly on `master` or `develop`. Always create a `feature/...` branch before editing any file.
 - Always start from the latest `develop` and use rebase.
 - Always work on branch: `feature/<your-name>/<short-task-name>`.
 - One branch = one task. One Pull Request = one topic.
